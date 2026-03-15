@@ -35,9 +35,23 @@ def upload():
             filename = secure_filename(upload.filename)
             upload.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             flash('File Saved', 'success')
-            return redirect(url_for('uploads')) # Update this to redirect the user to a route that displays all uploaded image files
+            return redirect(url_for('files')) # Update this to redirect the user to a route that displays all uploaded image files
     
     return render_template('upload.html', form=form)
+
+def get_uploaded_images():
+    imageFolder = os.path.join('uploads')
+    imageNames = os.listdir(imageFolder)[1:]
+    return imageNames
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(os.path.join(os.getcwd(),app.config['UPLOAD_FOLDER']), filename)
+
+@app.route('/files')
+@login_required
+def files():
+    return render_template('files.html', files=get_uploaded_images())
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
